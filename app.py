@@ -1,5 +1,6 @@
 import os
 import sys
+import urllib.parse
 from flask import Flask, render_template, request, redirect, url_for
 from pathlib import Path
 
@@ -31,17 +32,32 @@ def index():
         # Process only the actual media_type selections
         for key in form_data:
             if key.startswith('media_type_'):
-                item_path_str = key.replace('media_type_', '', 1)
+                # Original item_path_str extraction
+                item_path_str_original_from_key = key.replace('media_type_', '', 1)
                 
-                # --- DEBUGGING START ---
-                print(f"\n--- Processing form item ---")
-                print(f"1. Raw key from form: {key}")
-                print(f"2. Extracted item_path_str (URL-decoded by Flask): {item_path_str}")
-                # --- DEBUGGING END ---
+                # --- Enhanced Debugging ---
+                print(f"\n--- Debugging Path Transformation ---")
+                print(f"Original form key: {key}")
+                print(f"Path part from key (item_path_str_original_from_key): {item_path_str_original_from_key}")
+
+                # Apply unquote
+                item_path_str = urllib.parse.unquote(item_path_str_original_from_key)
+                print(f"Path part after urllib.parse.unquote (item_path_str): {item_path_str}")
+                # --- End Enhanced Debugging ---
+
+                # The original debug block follows, using the now unquoted item_path_str
+                # The print statement "--- Processing form item ---" can be kept or removed
+                # The print for "1. Raw key from form" is duplicative of "Original form key" above but fine.
+                # The print for "2. Extracted item_path_str..." is now covered by the new prints.
+
+                print(f"\n--- Processing form item (using unquoted path) ---") # Clarified this line
+                print(f"1. Raw key from form: {key}") # Kept for reference from user's log
+                # Print 2 is effectively replaced by the enhanced debugging above.
+                # For direct comparison with user's previous log format, let's show the final item_path_str here:
+                print(f"2. Final item_path_str for Path() constructor: {item_path_str}")
 
                 item_path = Path(item_path_str).resolve() 
                 
-                # --- DEBUGGING START ---
                 print(f"3. Path(item_path_str).resolve(): {item_path}")
                 print(f"4. Does it exist? {item_path.exists()}")
                 print(f"5. Is it a file? {item_path.is_file()}")
