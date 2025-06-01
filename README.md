@@ -58,3 +58,16 @@ This is a Flask web application designed to help you organize your media files (
 
 - This application creates symbolic links. The original files are not moved or copied.
 - Ensure the application has the necessary permissions to read the search directory and write to the working directory.
+
+## Testing
+
+A test script `test_symlink_fix.py` is included to verify the core logic of symlink creation, especially for directory names with spaces. This test was created to ensure that the URL decoding fix in `app.py` correctly handles such cases.
+
+To run the test:
+
+1.  Navigate to the project's root directory in your terminal.
+2.  Execute the script:
+    ```bash
+    python test_symlink_fix.py
+    ```
+3.  The script will print output indicating the steps it's taking and will report success or failure. It creates temporary directories for its operations and cleans them up afterward.
