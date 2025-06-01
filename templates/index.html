@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Organiser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Media Organiser</h1>
+
+        <div class="current-dirs">
+            <p><strong>Search Directory:</strong> {{ search_dir }}</p>
+            <p><strong>Working Directory:</strong> {{ working_dir }}</p>
+            <p><a href="{{ url_for('setup_dirs') }}">Change Directories</a></p>
+        </div>
+
+        <form method="POST">
+            <div class="file-list">
+                {% for item in file_tree %}
+                    <div class="file-item {% if item.type == 'dir' %}directory{% else %}file{% endif %}">
+                        <span class="indent" style="margin-left: {{ item.indent | length }}px;"></span>
+                        <span class="item-name">
+                            {% if item.type == 'dir' %}&#x1F4C1; <strong>{{ item.name }}</strong>{% else %}&#x1F4C4; {{ item.name }}{% endif %}
+                        </span>
+                        
+                        {# Display controls for both files and directories #}
+                        <div class="controls">
+                            <select name="media_type_{{ item.path | urlencode }}" class="media-type-select" onchange="updateTags(this, '{{ item.path | urlencode }}')">
+                                <option value="">--Select Type--</option>
+                                <option value="Movie">Movie</option>
+                                <option value="TV">TV</option>
+                                <option value="NA">NA</option>
+                            </select>
+
+                            <select name="tags_{{ item.path | urlencode }}" id="tags_select_{{ item.path | urlencode }}" multiple class="tags-select">
+                                </select>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const movieTags = {{ movie_tags | tojson }};
+        const tvTags = {{ tv_tags | tojson }};
+
+        function updateTags(selectElement, itemPath) {
+            const tagsSelect = document.getElementById(`tags_select_${itemPath}`);
+            tagsSelect.innerHTML = ''; // Clear existing options
+
+            const selectedType = selectElement.value;
+            let tagsToLoad = [];
+
+            if (selectedType === 'Movie') {
+                tagsToLoad = movieTags;
+            } else if (selectedType === 'TV') {
+                tagsToLoad = tvTags;
+            }
+
+            if (tagsToLoad.length > 0) {
+                tagsToLoad.forEach(tag => {
+                    const option = document.createElement('option');
+                    option.value = tag;
+                    option.textContent = tag;
+                    tagsSelect.appendChild(option);
+                });
+            } else if (selectedType !== 'NA') {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "-- No tags found --";
+                option.disabled = true;
+                tagsSelect.appendChild(option);
+            }
+            
+            // Disable tags select if NA is chosen
+            tagsSelect.disabled = (selectedType === 'NA');
+        }
+
+        // Initialize tags dropdowns on page load based on any default selection
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.media-type-select').forEach(selectElement => {
+                // Trigger the change event to populate tags if a type is already selected (e.g., after a back button)
+                updateTags(selectElement, selectElement.name.replace('media_type_', ''));
+            });
+        });
+    </script>
+</body>
+</html>

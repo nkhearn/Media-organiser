@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Directories</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Set Up Directories</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="search_directory">Search Directory:</label>
+                <input type="text" id="search_directory" name="search_directory" 
+                       value="{{ current_search_dir if current_search_dir else '' }}" 
+                       placeholder="/path/to/your/files" required>
+            </div>
+            <div class="form-group">
+                <label for="working_directory">Working Directory (for Movie/TV/Tags):</label>
+                <input type="text" id="working_directory" name="working_directory" 
+                       value="{{ current_working_dir if current_working_dir else '' }}" 
+                       placeholder="/path/to/your/media/library" required>
+            </div>
+            <button type="submit">Set Directories</button>
+        </form>
+    </div>
+</body>
+</html>
